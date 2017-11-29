@@ -1,5 +1,0 @@
-drivers
-drivers-*
-# too general?
-*_bmv2
-pd_thrift

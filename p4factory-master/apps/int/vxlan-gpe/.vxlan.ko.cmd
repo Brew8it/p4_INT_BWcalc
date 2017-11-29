@@ -1,1 +1,0 @@
-cmd_/home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan.ko /home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan.o /home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan.mod.o
