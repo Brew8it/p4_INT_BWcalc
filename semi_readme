@@ -1,0 +1,5 @@
+Install kernel 3.1.9 -> se p4 int github
+install vxlan_gpe -> se p4 int github
+install ptf lib -> sudo python setup.py install
+instal modified scapy -> sudo python setup.py install
+

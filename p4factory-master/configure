@@ -1,0 +1,3 @@
+cd submodules/switch/ && ./configure --with-p4factory "$@" && cd -
+cd submodules/bm/ && CXXFLAGS="$CXXFLAGS -O0 -g" ./configure --with-pdfixed --prefix=/inst && cd -
+cd submodules/p4ofagent && ./configure && cd -

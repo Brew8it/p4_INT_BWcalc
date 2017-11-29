@@ -1,0 +1,12 @@
+table_set_default ipv4_fib_lpm on_miss
+table_set_default forward no_rewrite
+table_set_default int_check_clone _drop
+table_set_dafault int_inst_0003 _drop
+
+table_add ipv4_fib_lpm set_nexthop 10.0.1.0/24 => 1
+table_add ipv4_fib_lpm set_nexthop 10.0.2.0/24 => 2
+
+table_add int_inst_0003 int_set_header_0003_i15 0xff00 =>
+
+table_add int_check_clone _add_timestamp 1 =>
+table_add othertable _add_timestamp 1 =>
