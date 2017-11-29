@@ -1,0 +1,17 @@
+How to push rules into the switch:
+*
+
+-- first test:
+sending packet into switch and packet comes out.
+
+-- second test:
+add the header fields ingress.
+# maybe write to a register so we can see that header has been added since wireshark cant see the INT header field.
+
+-- Third test:
+Clone the packet so we can see 2 packets leaving the switch.
+# take wireshark picture.
+
+Futher work and tests for report:
+-- add another switch and run a mininet instance where each switch has its own commands file. So we can test that our calculation and clone detection can be evaluated.
+-- For that to happen we have to add code to detect each switch ID. so only one detects clones and perform the calculation.
