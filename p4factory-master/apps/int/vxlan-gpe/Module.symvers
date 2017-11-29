@@ -1,0 +1,4 @@
+0x8f37000f	vxlan_sock_add	/home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan	EXPORT_SYMBOL_GPL
+0xe4ddff5f	vxlan_xmit_skb	/home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan	EXPORT_SYMBOL_GPL
+0xf7b58656	vxlan_get_rx_port	/home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan	EXPORT_SYMBOL_GPL
+0xcbc25fa9	vxlan_sock_release	/home/p4/Downloads/p4factory-master/apps/int/vxlan-gpe/vxlan	EXPORT_SYMBOL_GPL

@@ -1,0 +1,12 @@
+*~
+*.pyc
+parser.out
+parsetab.py
+oft.log
+*.dot
+*.png
+*.pcap
+*.ts
+*.json
+ptf.log
+build
