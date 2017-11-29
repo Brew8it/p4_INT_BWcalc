@@ -104,16 +104,11 @@ counter indirect_counter {
   instance_count : 1;
 }
 
-
 action rewrite_macs(smac,dmac){
   modify_field(ethernet.srcAddr, smac);
   modify_field(ethernet.dstAddr, dmac);
   count(indirect_counter,0);
 }
-
-
-
-
 
 action set_nexthop(nexthop){
   modify_field(standard_metadata.egress_spec, nexthop);
@@ -160,7 +155,15 @@ control ingress {
 }
 
 control egress {
+
+    // testing add_header_commands
+    egreess_header();
+
+    // clone the packet
+    egress_cloning();
+
     apply(forward);
+
     /* INT processing */
     //process_int_insertion();
 

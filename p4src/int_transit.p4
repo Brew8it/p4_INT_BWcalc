@@ -366,18 +366,17 @@ action packet_length() {
     count(packet_length_counter, 0);
 }
 
-// The "field list" that will replace the original packet metadata.
+/*// The "field list" that will replace the original packet metadata.
 field_list clone_list{
     standard_metadata;
 }
 /* Clone the packet egress to egress after header has been added
  in the first switch.
-*/
+
 action clone_e2e_pkt(mirror_id){
     clone_egress_pkt_to_egress(mirror_id,clone_list);
     modify_field(int_bw_header.clone_bit, 1);
-
-}
+}*/
 
 
 table int_bos {
@@ -602,7 +601,7 @@ action _add_timestamp(){
 
 //Drop action.
 action _drop(){
-    modify_field(ingress_metadata.drop_flag, TRUE);
+    drop();
 }
 
 action bw_calc() {
@@ -727,24 +726,54 @@ table int_insert {
     size : 3;
 }
 //#endif
-action clone_actions(){
 
-    callotheractions();
-    callbwaction();
+action adding_header(){
+    int_set_header_4();
 }
 
-
-table for_clone {
+table egress_add_header {
     reads{
-
+        ipv4.dstAddr : lpm;
     }
     actions {
-        clone_actions();
+        adding_header;
     }
 }
-control egreess_stuff{
-    apply()
+control egreess_header{
+    apply(egress_add_header);
 }
+
+
+
+// The "field list" that will replace the original packet metadata.
+field_list clone_list{
+    standard_metadata;
+}
+/* Clone the packet egress to egress after header has been added
+ in the first switch.
+*/
+
+action clone_e2e_pkt(mirror_id){
+    clone_egress_pkt_to_egress(mirror_id,clone_list);
+    modify_field(int_bw_header.clone_bit, 1);
+}
+
+table egress_clone_packet{
+    reads{
+        ipv4.dstAddr : lpm;
+    }
+    actions {
+        clone_e2e_pkt;
+    }
+}
+
+control egress_cloning{
+    if (int_bw_header.clone_bit != 1){
+        apply(egress_clone_packet);
+    }
+}
+
+
 
 
 control process_int_insertion {

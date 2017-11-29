@@ -5,7 +5,7 @@ How to push rules into the switch:
 sending packet into switch and packet comes out.
 
 -- second test:
-add the header fields ingress.
+add the header fields egress.
 # maybe write to a register so we can see that header has been added since wireshark cant see the INT header field.
 
 -- Third test:
@@ -15,3 +15,8 @@ Clone the packet so we can see 2 packets leaving the switch.
 Futher work and tests for report:
 -- add another switch and run a mininet instance where each switch has its own commands file. So we can test that our calculation and clone detection can be evaluated.
 -- For that to happen we have to add code to detect each switch ID. so only one detects clones and perform the calculation.
+
+
+----- We have to use the simple_switch_CLI to be able to clone packets!!!!
+p4@p4-VirtualBox:~/bmv2/targets/simple_switch$ sudo ./sswitch_CLI /home/p4/Downloads/p4_INT_BWcalc/switch.json < /home/p4/Downloads/p4_INT_BWcalc/command_files/commands_add_header.txt
+
