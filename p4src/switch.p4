@@ -98,6 +98,23 @@ metadata global_config_metadata_t global_config_metadata;
 action nop() {
 }
 
+counter indirect_counter {
+  type : bytes;
+  static : forward;
+  instance_count : 1;
+}
+
+
+action rewrite_macs(smac,dmac){
+  modify_field(ethernet.srcAddr, smac);
+  modify_field(ethernet.dstAddr, dmac);
+  count(indirect_counter,0);
+}
+
+
+
+
+
 action set_nexthop(nexthop){
   modify_field(standard_metadata.egress_spec, nexthop);
   subtract_from_field(ipv4.ttl, 1);
@@ -126,6 +143,7 @@ table forward {
     standard_metadata.egress_port : exact;
   }
   actions {
+    rewrite_macs;
     no_rewrite;
   }
   size : 64;
@@ -135,7 +153,7 @@ table forward {
 control ingress {
     apply(ipv4_fib_lpm);
     /* INT ingress timestamp on last switch */
-    process_int_timestamps();
+    //process_int_timestamps();
 
     /* INT src,sink determination */
     //process_int_endpoint();

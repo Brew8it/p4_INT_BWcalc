@@ -397,9 +397,9 @@ table int_bos {
         int_set_header_5_bos;
         int_set_header_6_bos;
         int_set_header_7_bos;
-        clone_e2e_pkt;
-        packet_length;
-        nop;
+        //clone_e2e_pkt;
+        //packet_length;
+        //nop;
     }
     size : 17;       // number of instruction bits
 }
@@ -727,6 +727,25 @@ table int_insert {
     size : 3;
 }
 //#endif
+action clone_actions(){
+
+    callotheractions();
+    callbwaction();
+}
+
+
+table for_clone {
+    reads{
+
+    }
+    actions {
+        clone_actions();
+    }
+}
+control egreess_stuff{
+    apply()
+}
+
 
 control process_int_insertion {
 //#ifdef INT_ENABLE
