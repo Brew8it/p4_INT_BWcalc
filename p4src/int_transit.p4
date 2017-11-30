@@ -831,7 +831,13 @@ table int_bw_original{
 //called from switch.p4 ingress pipeline
 control int_bw_ingress{
     // For testing add header...
+    //Test for checking calculation and drop of "clone" packet.
     apply(int_bw_clone);
+
+    //Test for saving original_packet_ts
+    //apply(int_bw_original);
+
+    // If is for when you have multiple switches.
     /*if (int_bw_header.clone_bit != 0) {
         apply(int_bw_clone);
     } else{

@@ -147,29 +147,19 @@ table forward {
 
 control ingress {
     apply(ipv4_fib_lpm);
-    //For testing...
-    egreess_header();
-    int_bw_ingress();
-    /* INT ingress timestamp on last switch */
-    //process_int_timestamps();
+    //For testing BW calc!
+    //egreess_header();
+    //int_bw_ingress();
 
-    /* INT src,sink determination */
-    //process_int_endpoint();
 }
 
 control egress {
 
     // testing add_header_commands
-    //egreess_header();
+    egreess_header();
 
-    // clone the packet
+    // testing cloning the packet
     //egress_cloning();
 
     apply(forward);
-
-    /* INT processing */
-    //process_int_insertion();
-
-    /* update underlay header based on INT information inserted */
-    //process_int_outer_encap();
 }
