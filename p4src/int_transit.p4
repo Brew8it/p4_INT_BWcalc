@@ -571,57 +571,6 @@ control process_int_endpoint {
 //#endif
 }
 
-
-
-
-
-// *lia's code*
-
-
-
-
-
-
-// *end lia's code*
-
-
-table int_header_timestamp {
-/*
-Needs no reads since we have already droped the cloned packet so all
-packets that reach this table are original packets and no check is needed.*/
-
-    actions{
-        _add_timestamp;
-        register_write_og;
-    }
-    size : 256;
-}
-
-// Table to detect a cloned packet.
-table int_check_clone {
-    reads{
-        // check the header field if its a clone.
-
-        int_bw_header.clone_bit         : valid;
-    }
-    actions{
-        _add_timestamp;
-        register_read_og;
-        bw_calc;
-        register_write_calc;
-        _drop;
-        // make calculation
-    }
-    size : 256;
-}
-
-//called from switch.p4 ingress pipeline
-control process_int_timestamps {
-//if(check if last switch)
-    apply(int_check_clone);
-    apply(int_header_timestamp);
-}
-
 //#ifdef INT_ENABLE
 //#ifdef INT_TRANSIT_ENABLE
 action int_transit(switch_id) {
@@ -707,7 +656,7 @@ table egress_add_header {
         adding_header;
     }
 }
-control egreess_header{
+control egress_header{
     apply(egress_add_header);
 }
 

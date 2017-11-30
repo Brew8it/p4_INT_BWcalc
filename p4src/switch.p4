@@ -148,7 +148,7 @@ table forward {
 control ingress {
     apply(ipv4_fib_lpm);
     //For testing BW calc!
-    //egreess_header();
+    //egress_header();
     //int_bw_ingress();
 
 }
@@ -156,7 +156,7 @@ control ingress {
 control egress {
 
     // testing add_header_commands
-    egreess_header();
+    egress_header();
 
     // testing cloning the packet
     //egress_cloning();
