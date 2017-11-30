@@ -21,6 +21,8 @@ limitations under the License.
  * Only IPv4 is supported as underlay protocol in this example.
  */
 //#ifdef INT_ENABLE
+
+
 header_type int_metadata_t {
     fields {
         switch_id           : 32;
@@ -93,9 +95,6 @@ action int_set_header_7() { //egress_port_tx_utilization
 action int_set_header_8() {
 
 }
-
-
-    //modify_field(int_bw_header.ingress_tstamp,i2e_metadata.ingress_tstamp);
 
 /* action function for bits 0-3 combinations, 0 is msb, 3 is lsb */
 /* Each bit set indicates that corresponding INT header should be added */
@@ -334,28 +333,9 @@ action int_set_header_7_bos() { //egress_port_tx_utilization
     modify_field(int_egress_port_tx_utilization_header.bos, 1);
 }
 
-// the register
-register timestamp_register {
-    width: 32;
-    static: int_header_timestamp;
-    instance_count: 10;
-}
 
-action register_write_og() {
-    // save the original packet timestamp into the register
-    register_write(timestamp_register, 0 ,int_bw_header.ingress_tstamp);
-}
-action register_write_calc(){
-    // Save our calculated bandwidth into the register
-    register_write(timestamp_register, 1,int_bw_header.C);
-}
-action register_read_og() {
-    /* This is called from the clone packet to save the og = original
-    packet's ingress timestamp into its header_field so we later
-    can preform the calculation
-    */
-    register_read(int_bw_header.original_packet_ts, timestamp_register, 0);
-}
+
+
 
 counter packet_length_counter {
     type: bytes;
@@ -590,45 +570,33 @@ control process_int_endpoint {
     }
 //#endif
 }
-//new code for ingress timestamps
-action _add_timestamp(){
-    //
-    modify_field(int_bw_header.ingress_tstamp,
-        i2e_metadata.ingress_tstamp);
-        //
-    register_read(int_bw_header.original_packet_ts, timestamp_register, 0);
-}
 
-//Drop action.
-action _drop(){
-    drop();
-}
 
-action bw_calc() {
-// 153 byte long packets taken from the ingress_bd_stat counter
-    modify_field(int_bw_header.l, 153);
-// delta = clone_Ingress_Tstamp - original_ingress_Tstamp
-    modify_field(int_bw_header.delta,
-        int_bw_header.ingress_tstamp -
-        int_bw_header.original_packet_ts);
-// C = packet lenght / delta
-    modify_field(int_bw_header.C,
-        int_bw_header.l /
-        int_bw_header.delta);
-}
+
+
+
+// *lia's code*
+
+
+
+
+
+
+// *end lia's code*
 
 
 table int_header_timestamp {
 /*
 Needs no reads since we have already droped the cloned packet so all
-packets that reach this table are original packets and no check is needed.
-*/
+packets that reach this table are original packets and no check is needed.*/
+
     actions{
         _add_timestamp;
         register_write_og;
     }
     size : 256;
 }
+
 // Table to detect a cloned packet.
 table int_check_clone {
     reads{
@@ -753,6 +721,8 @@ field_list clone_list{
  in the first switch.
 */
 
+
+
 action clone_e2e_pkt(mirror_id){
     clone_egress_pkt_to_egress(mirror_id,clone_list);
     modify_field(int_bw_header.clone_bit, 1);
@@ -772,6 +742,104 @@ control egress_cloning{
         apply(egress_clone_packet);
     }
 }
+
+
+/*header_type intrinsic_metadata_t {
+    fields{
+        ingress_global_timestamp : 48;
+    }
+}*/
+
+
+
+//new code for ingress timestamps
+action _add_timestamp(){
+    modify_field(int_bw_header.ingress_tstamp,_ingress_global_tstamp_);
+}
+
+action register_read_og() {
+    /* This is called from the clone packet to save the og = original
+    packet's ingress timestamp into its header_field so we later
+    can preform the calculation
+    */
+    register_read(int_bw_header.original_packet_ts, timestamp_register, 0);
+}
+
+action bw_calc() {
+// we can see from wireshark packet with our header = 55 bytes. convert to bit = 440 (e.g 55 * 8).
+    modify_field(int_bw_header.l, 440);
+// delta = clone_Ingress_Tstamp - original_ingress_Tstamp
+    modify_field(int_bw_header.delta, int_bw_header.ingress_tstamp - int_bw_header.original_packet_ts);
+// the delta time is microseconds so we convert it to seconds (1 second = 1000000 microseconds)
+    modify_field(int_bw_header.delta, int_bw_header.delta / 1000000);
+// C = packet lenght / delta
+// Bandwidth = bits / second
+    modify_field(int_bw_header.C, int_bw_header.l / int_bw_header.delta);
+}
+
+action register_write_calc(){
+    // Save our calculated bandwidth into the register
+    register_write(timestamp_register, 1 , int_bw_header.C);
+
+}
+
+//Drop action.
+action _drop(){
+    drop();
+}
+
+
+action register_write_og() {
+    // save the original packet timestamp into the register
+    register_write(timestamp_register, 0 ,int_bw_header.ingress_tstamp);
+}
+
+// the register
+register timestamp_register {
+    width: 32;
+    instance_count: 10;
+}
+
+action bw_handling_clone(){
+    _add_timestamp();
+    register_read_og();
+    bw_calc();
+    register_write_calc();
+    _drop();
+}
+
+action bw_handling_original(){
+    _add_timestamp();
+    register_write_og();
+}
+
+
+table int_bw_clone{
+    actions{
+        bw_handling_clone;
+    }
+    size : 256;
+}
+table int_bw_original{
+    actions{
+        bw_handling_original;
+    }
+    size : 256;
+}
+
+
+//called from switch.p4 ingress pipeline
+control int_bw_ingress{
+    // For testing add header...
+    apply(int_bw_clone);
+    /*if (int_bw_header.clone_bit != 0) {
+        apply(int_bw_clone);
+    } else{
+        apply(int_bw_original);
+    }*/
+}
+
+
 
 
 

@@ -4839,10 +4839,10 @@
             "order": [
                 "ethernet",
                 "fabric_header",
-                "fabric_header_multicast",
                 "fabric_header_mirror",
-                "fabric_header_unicast",
                 "fabric_header_cpu",
+                "fabric_header_unicast",
+                "fabric_header_multicast",
                 "fabric_header_sflow",
                 "fabric_payload_header",
                 "llc_header",
@@ -4854,7 +4854,6 @@
                 "mpls[1]",
                 "mpls[2]",
                 "ipv6",
-                "icmp",
                 "gre",
                 "nvgre",
                 "erspan_t3_header",
@@ -4862,6 +4861,11 @@
                 "vxlan_gpe",
                 "vxlan_gpe_int_header",
                 "int_header",
+                "genv",
+                "vxlan",
+                "sflow",
+                "tcp",
+                "icmp",
                 "int_switch_id_header",
                 "int_ingress_port_id_header",
                 "int_hop_latency_header",
@@ -4894,15 +4898,11 @@
                 "int_val[21]",
                 "int_val[22]",
                 "int_val[23]",
-                "vxlan",
-                "genv",
                 "inner_ethernet",
-                "inner_ipv6",
                 "inner_ipv4",
+                "inner_ipv6",
                 "inner_udp",
                 "inner_icmp",
-                "sflow",
-                "tcp",
                 "inner_tcp"
             ]
         }
@@ -4910,131 +4910,8 @@
     "meter_arrays": [],
     "actions": [
         {
-            "name": "set_nexthop",
-            "id": 0,
-            "runtime_data": [
-                {
-                    "name": "nexthop",
-                    "bitwidth": 9
-                }
-            ],
-            "primitives": [
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "standard_metadata",
-                                "egress_spec"
-                            ]
-                        },
-                        {
-                            "type": "runtime_data",
-                            "value": 0
-                        }
-                    ]
-                },
-                {
-                    "op": "subtract_from_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "ipv4",
-                                "ttl"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "on_miss",
-            "id": 1,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "no_op",
-                    "parameters": []
-                }
-            ]
-        },
-        {
-            "name": "clone_e2e_pkt",
-            "id": 2,
-            "runtime_data": [
-                {
-                    "name": "mirror_id",
-                    "bitwidth": 32
-                }
-            ],
-            "primitives": [
-                {
-                    "op": "clone_egress_pkt_to_egress",
-                    "parameters": [
-                        {
-                            "type": "runtime_data",
-                            "value": 0
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                },
-                {
-                    "op": "modify_field",
-                    "parameters": [
-                        {
-                            "type": "field",
-                            "value": [
-                                "int_bw_header",
-                                "clone_bit"
-                            ]
-                        },
-                        {
-                            "type": "hexstr",
-                            "value": "0x1"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "no_rewrite",
-            "id": 3,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "drop",
-                    "parameters": []
-                }
-            ]
-        },
-        {
-            "name": "adding_header",
-            "id": 4,
-            "runtime_data": [],
-            "primitives": [
-                {
-                    "op": "add_header",
-                    "parameters": [
-                        {
-                            "type": "header",
-                            "value": "int_bw_header"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "name": "rewrite_macs",
-            "id": 5,
+            "id": 0,
             "runtime_data": [
                 {
                     "name": "smac",
@@ -5092,6 +4969,276 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "set_nexthop",
+            "id": 1,
+            "runtime_data": [
+                {
+                    "name": "nexthop",
+                    "bitwidth": 9
+                }
+            ],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "standard_metadata",
+                                "egress_spec"
+                            ]
+                        },
+                        {
+                            "type": "runtime_data",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "op": "subtract_from_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "ttl"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "on_miss",
+            "id": 2,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "no_op",
+                    "parameters": []
+                }
+            ]
+        },
+        {
+            "name": "no_rewrite",
+            "id": 3,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "drop",
+                    "parameters": []
+                }
+            ]
+        },
+        {
+            "name": "bw_handling_clone",
+            "id": 4,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "ingress_tstamp"
+                            ]
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "intrinsic_metadata",
+                                "ingress_global_timestamp"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "register_read",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "original_packet_ts"
+                            ]
+                        },
+                        {
+                            "type": "register_array",
+                            "value": "timestamp_register"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x0"
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "l"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1b8"
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "delta"
+                            ]
+                        },
+                        {
+                            "type": "expression",
+                            "value": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "-",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "int_bw_header",
+                                            "ingress_tstamp"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "field",
+                                        "value": [
+                                            "int_bw_header",
+                                            "original_packet_ts"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "delta"
+                            ]
+                        },
+                        {
+                            "type": "expression",
+                            "value": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "/",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "int_bw_header",
+                                            "delta"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "hexstr",
+                                        "value": "0xf4240"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "C"
+                            ]
+                        },
+                        {
+                            "type": "expression",
+                            "value": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "/",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "int_bw_header",
+                                            "l"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "field",
+                                        "value": [
+                                            "int_bw_header",
+                                            "delta"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "op": "register_write",
+                    "parameters": [
+                        {
+                            "type": "register_array",
+                            "value": "timestamp_register"
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "0x1"
+                        },
+                        {
+                            "type": "field",
+                            "value": [
+                                "int_bw_header",
+                                "C"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "op": "drop",
+                    "parameters": []
+                }
+            ]
+        },
+        {
+            "name": "adding_header",
+            "id": 5,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "add_header",
+                    "parameters": [
+                        {
+                            "type": "header",
+                            "value": "int_bw_header"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "pipelines": [
@@ -5101,8 +5248,53 @@
             "init_table": "ipv4_fib_lpm",
             "tables": [
                 {
-                    "name": "ipv4_fib_lpm",
+                    "name": "egress_add_header",
                     "id": 0,
+                    "match_type": "lpm",
+                    "type": "simple",
+                    "max_size": 16384,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "lpm",
+                            "target": [
+                                "ipv4",
+                                "dstAddr"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "adding_header"
+                    ],
+                    "next_tables": {
+                        "adding_header": "int_bw_clone"
+                    },
+                    "base_default_next": "int_bw_clone"
+                },
+                {
+                    "name": "int_bw_clone",
+                    "id": 1,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 256,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [],
+                    "actions": [
+                        "bw_handling_clone"
+                    ],
+                    "next_tables": {
+                        "bw_handling_clone": null
+                    },
+                    "base_default_next": null
+                },
+                {
+                    "name": "ipv4_fib_lpm",
+                    "id": 2,
                     "match_type": "lpm",
                     "type": "simple",
                     "max_size": 5000,
@@ -5124,10 +5316,10 @@
                         "on_miss"
                     ],
                     "next_tables": {
-                        "set_nexthop": null,
-                        "on_miss": null
+                        "set_nexthop": "egress_add_header",
+                        "on_miss": "egress_add_header"
                     },
-                    "base_default_next": null
+                    "base_default_next": "egress_add_header"
                 }
             ],
             "action_profiles": [],
@@ -5136,62 +5328,8 @@
         {
             "name": "egress",
             "id": 1,
-            "init_table": "egress_add_header",
+            "init_table": "forward",
             "tables": [
-                {
-                    "name": "egress_add_header",
-                    "id": 1,
-                    "match_type": "lpm",
-                    "type": "simple",
-                    "max_size": 16384,
-                    "with_counters": false,
-                    "direct_meters": null,
-                    "support_timeout": false,
-                    "key": [
-                        {
-                            "match_type": "lpm",
-                            "target": [
-                                "ipv4",
-                                "dstAddr"
-                            ],
-                            "mask": null
-                        }
-                    ],
-                    "actions": [
-                        "adding_header"
-                    ],
-                    "next_tables": {
-                        "adding_header": "_condition_0"
-                    },
-                    "base_default_next": "_condition_0"
-                },
-                {
-                    "name": "egress_clone_packet",
-                    "id": 2,
-                    "match_type": "lpm",
-                    "type": "simple",
-                    "max_size": 16384,
-                    "with_counters": false,
-                    "direct_meters": null,
-                    "support_timeout": false,
-                    "key": [
-                        {
-                            "match_type": "lpm",
-                            "target": [
-                                "ipv4",
-                                "dstAddr"
-                            ],
-                            "mask": null
-                        }
-                    ],
-                    "actions": [
-                        "clone_e2e_pkt"
-                    ],
-                    "next_tables": {
-                        "clone_e2e_pkt": "forward"
-                    },
-                    "base_default_next": "forward"
-                },
                 {
                     "name": "forward",
                     "id": 3,
@@ -5223,31 +5361,7 @@
                 }
             ],
             "action_profiles": [],
-            "conditionals": [
-                {
-                    "name": "_condition_0",
-                    "id": 0,
-                    "expression": {
-                        "type": "expression",
-                        "value": {
-                            "op": "!=",
-                            "left": {
-                                "type": "field",
-                                "value": [
-                                    "int_bw_header",
-                                    "clone_bit"
-                                ]
-                            },
-                            "right": {
-                                "type": "hexstr",
-                                "value": "0x1"
-                            }
-                        }
-                    },
-                    "true_next": "egress_clone_packet",
-                    "false_next": "forward"
-                }
-            ]
+            "conditionals": []
         }
     ],
     "calculations": [
@@ -5477,70 +5591,7 @@
         }
     ],
     "learn_lists": [],
-    "field_lists": [
-        {
-            "id": 1,
-            "name": "clone_list",
-            "elements": [
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "ingress_port"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "packet_length"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "egress_spec"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "egress_port"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "egress_instance"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "instance_type"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "clone_spec"
-                    ]
-                },
-                {
-                    "type": "field",
-                    "value": [
-                        "standard_metadata",
-                        "_padding"
-                    ]
-                }
-            ]
-        }
-    ],
+    "field_lists": [],
     "counter_arrays": [
         {
             "name": "indirect_counter",
@@ -5549,7 +5600,14 @@
             "size": 1
         }
     ],
-    "register_arrays": [],
+    "register_arrays": [
+        {
+            "name": "timestamp_register",
+            "id": 0,
+            "bitwidth": 32,
+            "size": 10
+        }
+    ],
     "force_arith": [
         [
             "standard_metadata",

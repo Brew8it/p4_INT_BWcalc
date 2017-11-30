@@ -20,3 +20,5 @@ Futher work and tests for report:
 ----- We have to use the simple_switch_CLI to be able to clone packets!!!!
 p4@p4-VirtualBox:~/bmv2/targets/simple_switch$ sudo ./sswitch_CLI /home/p4/Downloads/p4_INT_BWcalc/switch.json < /home/p4/Downloads/p4_INT_BWcalc/command_files/commands_add_header.txt
 
+sudo ./sswitch_CLI /home/p4/Downloads/p4_INT_BWcalc/switch.json 
+

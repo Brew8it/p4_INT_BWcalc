@@ -147,6 +147,9 @@ table forward {
 
 control ingress {
     apply(ipv4_fib_lpm);
+    //For testing...
+    egreess_header();
+    int_bw_ingress();
     /* INT ingress timestamp on last switch */
     //process_int_timestamps();
 
@@ -157,10 +160,10 @@ control ingress {
 control egress {
 
     // testing add_header_commands
-    egreess_header();
+    //egreess_header();
 
     // clone the packet
-    egress_cloning();
+    //egress_cloning();
 
     apply(forward);
 
