@@ -1,8 +1,8 @@
 ## P4_INT_BWcalc
 This is our final project for the course Computer Communication II at Karlstad University 
 
-Disclaimer: To be able to run our code you need to have installed the P4 behavior model prior to following this readme. 
-We used the supplied VM at the university lab room.
+*Disclaimer: To be able to run our code you need to have installed the P4 behavior model prior to following this readme. 
+We used the supplied VM at the university lab room.*
 
 ### Installing the project's dependencies
 * Install linux kernel 3.19.
